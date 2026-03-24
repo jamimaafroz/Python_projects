@@ -1,6 +1,7 @@
 import numpy as np
 
 var = np.array([1,2,3,4])
+
 varAdd = var+3
 print(var)
 print(varAdd)#added 3 with all the elements in the arrray
@@ -16,5 +17,7 @@ print(sum2)
 array2d = np.array([[1,2,3,4],[5,6,7,8]])
 array2d2 = np.array([[1,2,3,4],[5,6,7,8]])
 sum2Darray = array2d+array2d2
+Mul2Darray = array2d*array2d2
 print(array2d)
 print(sum2Darray)
+print(Mul2Darray)
