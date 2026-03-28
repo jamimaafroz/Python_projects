@@ -1,8 +1,9 @@
 # Student manager system using a List of Dictionaries
 import json
-
+import numpy as np
 
 student_list = []
+
 def load_data():
     global student_list
     try:
@@ -13,8 +14,7 @@ def load_data():
 
 def save_data():
     with open("students.json", "w") as file:
-        json.dump(student_list, file)
-
+        json.dump(student_list, file, indent=4)
 
 def addStudent():
     studentInfo = {}
@@ -25,17 +25,85 @@ def addStudent():
         key = input("Enter Key (e.g., Name, ID, Marks): ")
         if key.lower() == 'quit':
             break
-            
-        value = input(f"Enter Student {key}: ")
         
-        if value.isdigit():
-            value = int(value)
-            
-        studentInfo[key] = value
+        if key.lower() == 'marks':
+            # Convert marks input to list of integers
+            try:
+                value = list(map(int, input("Enter marks (space separated): ").split()))
+            except ValueError:
+                print("Invalid marks. Please enter numbers only.")
+                continue
+        else:
+            value = input(f"Enter Student {key}: ")
+            # Convert numeric strings to int if possible
+            if value.isdigit():
+                value = int(value)
         
-    print("\nStudent Added: ", studentInfo)
-    student_list.append(studentInfo)
+        studentInfo[key] = value  # <-- Correct indentation here
+
+    if studentInfo:
+        print("\nStudent Added: ", studentInfo)
+        student_list.append(studentInfo)
+        save_data()
+    else:
+        print("No student data entered.")
+
+def deleteStudent():
+    if len(student_list) == 0:
+        print("The database is currently empty. No students to delete.")
+        return
+    search_key = input("Enter the key to search by (e.g., Name, ID): ")
+    search_value = input(f"Enter the {search_key} of the student you want to delete: ")
+    if search_value.isdigit():
+        search_value = int(search_value)
+        
+    student_found = False
+    for i, student in enumerate(student_list):
+        if search_key in student and student[search_key] == search_value:
+            removed_student = student_list.pop(i)
+            print(f"\nSuccess! Deleted student: {removed_student}")
+            student_found = True
+            break 
+            
+    if not student_found:
+        print(f"\nCould not find any student with {search_key} '{search_value}'.")
     save_data()
+def updateStudent():
+    if len(student_list) == 0:
+        print("The database is empty. No students to update.")
+        return
+    
+    search_key = input("Enter the key to search by (e.g., Name, ID): ")
+    search_value = input(f"Enter the {search_key} of the student you want to update: ")
+    
+    if search_value.isdigit():
+        search_value = int(search_value)
+    
+    # Find student
+    for student in student_list:
+        if search_key in student and student[search_key] == search_value:
+            print(f"\nFound student: {student}")
+            print("Enter new values (leave blank to keep current value):")
+            
+            for key in student.keys():
+                if key.lower() == "marks":
+                    marks_input = input(f"{key} (current: {student[key]}): ")
+                    if marks_input.strip():  # if not empty
+                        try:
+                            student[key] = list(map(int, marks_input.split()))
+                        except ValueError:
+                            print("Invalid marks input. Skipping update for marks.")
+                else:
+                    new_value = input(f"{key} (current: {student[key]}): ")
+                    if new_value.strip():  # if not empty
+                        student[key] = int(new_value) if new_value.isdigit() else new_value
+            
+            save_data()
+            print("\nStudent updated successfully!")
+            print(student)
+            return
+    
+    print(f"\nCould not find any student with {search_key} '{search_value}'.")
 
 def showStudents():
     print("\n--- All Students ---")
@@ -45,7 +113,19 @@ def showStudents():
         for index, student in enumerate(student_list):
             print(f"Student {index + 1}: {student}")
 
-
+def find_topper():
+    if len(student_list) == 0:
+        print("No students in the database.")
+        return
+    
+    all_marks = []
+    names = []
+    
+    for student in student_list:
+        if "Marks" in student:
+            all_marks.append(student["Marks"])
+            names.append(student.get("Name","Unknown"))
+        
 # --- Main Program Loop ---
 
 load_data()
@@ -56,8 +136,8 @@ while True:
     print("1. Add Student")
     print("2. Show Students")
     print("3. Search Student (Coming Soon)")
-    print("4. Delete Student (Coming Soon)")
-    print("5. Update Student (Coming Soon)")
+    print("4. Delete Student")
+    print("5. Update Student")
     print("6. Exit")
 
     choice = input("\nEnter choice (1-6): ")
@@ -72,10 +152,10 @@ while True:
         print("\nFeature not yet implemented!")
         
     elif choice == '4':
-        print("\nFeature not yet implemented!")
+        deleteStudent()
         
     elif choice == '5':
-        print("\nFeature not yet implemented!")
+        updateStudent()
         
     elif choice == '6':
         print("\nExiting Student Management System. Goodbye!")
