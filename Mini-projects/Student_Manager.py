@@ -125,6 +125,19 @@ def find_topper():
         if "Marks" in student:
             all_marks.append(student["Marks"])
             names.append(student.get("Name","Unknown"))
+        else:
+            all_marks.append[0]
+            names.append(student.get("Name","Unknown"))
+    max_len = max(len(m) for m in all_marks)
+    all_marks = [m+[0]*(max_len-len(m)) for m in all_marks]
+    
+    marks_array = np.array(all_marks)
+    total_marks = marks_array.sum(axis=1)
+    topper_indices = np.where(total_marks == total_marks.max())[0]
+    
+    print("\n--- Topper Student(s) ---")
+    for i in topper_indices:
+        print(f"Name: {names[i]},Marks:{marks_array[i]},Total:{total_marks[i]}")
         
 # --- Main Program Loop ---
 
@@ -135,7 +148,7 @@ while True:
     print("="*30)
     print("1. Add Student")
     print("2. Show Students")
-    print("3. Search Student (Coming Soon)")
+    print("3. Find Topper")
     print("4. Delete Student")
     print("5. Update Student")
     print("6. Exit")
@@ -149,7 +162,7 @@ while True:
         showStudents()
         
     elif choice == '3':
-        print("\nFeature not yet implemented!")
+        find_topper()
         
     elif choice == '4':
         deleteStudent()
